@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const requireLogin = require('../middleware/verifyuser');
+const User = require('../models/user');
 
 const app = express();
 
@@ -24,4 +25,9 @@ router.get('/userdetails',requireLogin,(req,res)=>{
     res.json(userdata);
 })
 
+router.post('/viewuserdetails',requireLogin,(req,res)=>{
+    User.find({_id:req.body.userid}).then(data=>{
+        res.json({data});  
+    })
+})
 module.exports = router;

@@ -27,8 +27,9 @@ router.post('/createpost',requireLogin,(req,res)=>{
 });
 
 router.get('/viewallpost',requireLogin,(req,res)=>{
-    Post.find()
+    Post.find().sort({createdAt : -1})
     .populate("postedBy","_id name profilePic")
+    .populate("comments.postedBy","_id name profilePic")
     .then(posts=>{
         res.json({posts});
     })
@@ -39,9 +40,9 @@ router.get('/viewallpost',requireLogin,(req,res)=>{
 
 router.get('/mypost',requireLogin,(req,res)=>{
     Post.find({postedBy:req.user._id})
-    .populate("postedBy","_id name")
+    .populate("postedBy","_id name profilePic")
     .then(mypost=>{
-        res.json(mypost);
+        res.json({mypost});
     })
     .catch(err=>{
         console.log(err);
