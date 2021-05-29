@@ -28,6 +28,13 @@ router.post('/update_profile',requireLogin,(req,res)=>{
     })
 });
 
+router.get('/viewloggedInuserDetails',requireLogin,(req,res)=>{
+    User.find({_id: req.user._id}).then(data=>{
+        console.log('logged in user details=>',data);
+        res.json(data);
+    })
+})
+
 
 
 

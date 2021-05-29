@@ -27,7 +27,19 @@ router.post('/createpost',requireLogin,(req,res)=>{
 });
 
 router.get('/viewallpost',requireLogin,(req,res)=>{
-    Post.find().sort({createdAt : -1})
+    Post.find().sort({$natural : -1})
+    .populate("postedBy","_id name profilePic")
+    .populate("comments.postedBy","_id name profilePic")
+    .then(posts=>{
+        res.json({posts});
+    })
+    .catch(err=>{
+        console.log(err);
+    })
+});
+
+router.get('/loadMorePost',requireLogin,(req,res)=>{
+    Post.find().sort({$natural : -1}).limit(3).skip(3)
     .populate("postedBy","_id name profilePic")
     .populate("comments.postedBy","_id name profilePic")
     .then(posts=>{
@@ -50,39 +62,73 @@ router.get('/mypost',requireLogin,(req,res)=>{
 });
 
 router.put('/like',requireLogin,(req,res)=>{
-    Post.findByIdAndUpdate(req.body.postId,{
-        $push:{likes:req.user._id}
-    },{
-        new:true
+    Post.findById(req.body.postId)
+    .then((post)=>{
+        if(!post){
+            return res.status(404).json({message: 'Post not found.'});
+        }
+        const likes = [...post.likes];
+        const foundUser = likes.find((user)=>user.toString()==req.user._id);
+        if(foundUser !== undefined){
+            return res.status(403).json({
+                message: 'Forbidden',
+                details: ['User has already liked the post.']
+            })
+        }
+        Post.findByIdAndUpdate(req.body.postId,{
+            $push:{likes:req.user._id},
+            $pull:{dislikes:req.user._id}
+
+        },{
+            new:true
+        })
+        .populate("postedBy","_id name profilePic")
+        .populate("comments.postedBy","_id name profilePic")
+        .exec((err,result)=>{
+            if(err){
+                return res.status(422).json({error: err})
+            }
+            else{
+                res.json(result);
+            }
+        });
     })
-    .populate("postedBy","_id name profilePic")
-    .exec((err,result)=>{
-        if(err){
-            return res.status(422).json({error: err})
-        }
-        else{
-            res.json(result);
-        }
-    });
 });
 
 router.put('/dislike',requireLogin,(req,res)=>{
-    Post.findByIdAndUpdate(req.body.postId,{
-        $pull:{likes:req.user._id},
-        $push:{dislikes:req.user._id}
-    },{
-        new:true
+    Post.findById(req.body.postId)
+    .then((post)=>{
+        if(!post){
+            return res.status(404).json({message: 'Post not found.'});
+        }
+        const dislikes = [...post.dislikes];
+        const foundUser = dislikes.find((user)=>user.toString()==req.user._id);
+        if(foundUser !== undefined){
+            return res.status(403).json({
+                message: 'Forbidden',
+                details: ['User has already disliked the post.']
+            })
+        }
+        Post.findByIdAndUpdate(req.body.postId,{
+            $pull:{likes:req.user._id},
+            $push:{dislikes:req.user._id}
+        },{
+            new:true
+        })
+        .populate("postedBy","_id name profilePic")
+        .populate("comments.postedBy","_id name profilePic")
+        .exec((err,result)=>{
+            if(err){
+                return res.status(422).json({error: err})
+            }
+            else{
+                res.json(result);
+            }
+        });
     })
-    .populate("postedBy","_id name profilePic")
-    .exec((err,result)=>{
-        if(err){
-            return res.status(422).json({error: err})
-        }
-        else{
-            res.json(result);
-        }
-    });
 });
+
+
 
 router.put('/comment',requireLogin,(req,res)=>{
     const comment = {
@@ -94,7 +140,7 @@ router.put('/comment',requireLogin,(req,res)=>{
     },{
         new:true
     })
-    .populate("comments.postedBy","_id name")
+    .populate("comments.postedBy","_id name profilePic")
     .populate("postedBy","_id name profilePic")
     .exec((err,result)=>{
         if(err){
@@ -124,6 +170,18 @@ router.delete('/deletepost/:postId',requireLogin,(req,res)=>{
             })
         }
     });
+});
+
+router.post('/contactPost',requireLogin,(req,res)=>{
+    Post.find({postedBy:req.body.contact_id})
+    .populate("postedBy","_id name profilePic")
+    .then(mypost=>{
+        console.log('mypost==>',mypost)
+        res.json({mypost});
+    })
+    .catch(err=>{
+        console.log(err);
+    })
 });
 
 module.exports = router;

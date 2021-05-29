@@ -30,4 +30,11 @@ router.post('/viewuserdetails',requireLogin,(req,res)=>{
         res.json({data});  
     })
 })
+
+router.post('/viewContactDetails',requireLogin,(req,res)=>{
+    User.find({_id:req.body.contact_id}).then(data=>{
+        res.json({data});  
+    })
+})
+
 module.exports = router;

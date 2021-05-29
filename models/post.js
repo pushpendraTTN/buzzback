@@ -8,8 +8,15 @@ const postSchema = new mongoose.Schema({
     photo:{
         type: String
     },
+    report:[
+        {
+            type: ObjectId,
+            ref:"User"
+    
+        }
+    ],
     reportCount:{
-        type: Number 
+        type:Number
     },
     likes: [
         {
