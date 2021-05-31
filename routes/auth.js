@@ -20,7 +20,14 @@ router.get('/userdetails',requireLogin,(req,res)=>{
         friends: req.user.friends.length,
         website: req.user.myWebsite,
         designation: req.user.designation,
-        role: req.user.role
+        role: req.user.role,
+        city:req.user.city,
+        state:req.user.state,
+        zipCode:req.user.zipCode,
+        DOB:req.user.DOB,
+        fname:req.user.firstName,
+        lname:req.user.lastName,
+        gender:req.user.gender
     }
     res.json(userdata);
 })

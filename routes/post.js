@@ -4,6 +4,7 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const requireLogin = require('../middleware/verifyuser');
 const Post = require('../models/post');
+const User = require('../models/user');
 
 
 router.post('/createpost',requireLogin,(req,res)=>{
@@ -182,6 +183,32 @@ router.post('/contactPost',requireLogin,(req,res)=>{
     .catch(err=>{
         console.log(err);
     })
+});
+
+router.get('/getfeedPost',requireLogin,(req,res)=>{
+    User.findById(req.user._id,(err,user)=>{
+        if(err){
+            return res.status(500).json({
+                message: 'ERROR Occured'
+            })
+        }
+    const frdsList = user.friends;
+    frdsList.push(req.user._id);
+
+    Post.find({postedBy: {$in: frdsList}}).sort({createdAt: -1}).limit(10)
+    // .populate('postedBy')
+    .populate("postedBy","_id name profilePic")
+    .populate("comments.postedBy","_id name profilePic")
+    .then((posts)=>{
+        if(posts.length===0){
+            return res.status(404).json({message:'No posts Found'})
+        }
+        return res.json({posts});
+    })
+    .catch(err=>{
+        console.log(err);
+    })
+    })   
 });
 
 module.exports = router;
