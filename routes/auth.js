@@ -11,7 +11,6 @@ router.get('/protected',requireLogin,(req,res)=>{
 });
 
 router.get('/userdetails',requireLogin,(req,res)=>{
-    console.log(req.user);
     const userdata = {
         id: req.user._id,
         name: req.user.name,

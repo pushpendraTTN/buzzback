@@ -5,8 +5,7 @@ const requireLogin = require('../middleware/verifyuser');
 const User = require('../models/user');
 ObjectId = require('mongodb').ObjectID;
 
-router.post
-('/request',requireLogin,(req,res)=>{
+router.post('/request',requireLogin,(req,res)=>{
     User.findByIdAndUpdate(req.user._id,{
         $push:{requested:req.body.id}
     },{

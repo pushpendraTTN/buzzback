@@ -177,7 +177,7 @@ router.post('/contactPost',requireLogin,(req,res)=>{
     Post.find({postedBy:req.body.contact_id})
     .populate("postedBy","_id name profilePic")
     .then(mypost=>{
-        console.log('mypost==>',mypost)
+        // console.log('mypost==>',mypost)
         res.json({mypost});
     })
     .catch(err=>{

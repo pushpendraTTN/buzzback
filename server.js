@@ -48,7 +48,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.get('/google',(req,res,next)=>{
-    console.log("reached google");
     next();
 }, passport.authenticate('google', { session:false, scope: ['profile', 'email',] }));
 

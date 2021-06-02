@@ -20,7 +20,7 @@ router.post('/update_profile',requireLogin,(req,res)=>{
     User.findByIdAndUpdate(req.user._id,data)
     .then(result=>{
         console.log("Successfully Update");
-        console.log(result);
+        // console.log(result);
         res.json({message:"Sucessfully Update"});
     })
     .catch(err=>{
@@ -30,7 +30,7 @@ router.post('/update_profile',requireLogin,(req,res)=>{
 
 router.get('/viewloggedInuserDetails',requireLogin,(req,res)=>{
     User.find({_id: req.user._id}).then(data=>{
-        console.log('logged in user details=>',data);
+        // console.log('logged in user details=>',data);
         res.json(data);
     })
 })
