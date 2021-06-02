@@ -59,8 +59,6 @@ app.get('/auth/google/callback',passport.authenticate('google',
 ),(req,res,next)=>{
     const token = jwt.sign({_id: req.user._id},secret);
     res.cookie('token',token);
-    const data=JSON.stringify(req.user.email);
-    res.cookie('email',data);
     res.redirect('http://localhost:3000/feed');
     next();
 });
